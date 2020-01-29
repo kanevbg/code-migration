@@ -3,6 +3,7 @@
  * Copyright © 2015 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 namespace Magento\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -14,6 +15,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ConvertPhpCode extends Command
 {
     const CONVERTED_FILE_EXT = '.converted';
+
+    const CONVERT_AS_COPY = false;
 
     /**
      * @var \Magento\Migration\Utility\File
@@ -46,7 +49,8 @@ class ConvertPhpCode extends Command
         \Magento\Migration\Code\Converter $converter,
         \Magento\Migration\Utility\File $fileUtil,
         \Magento\Migration\Logger\Logger $logger
-    ) {
+    )
+    {
         parent::__construct();
         $this->objectManager = $objectManager;
         $this->converter = $converter;
@@ -117,8 +121,21 @@ class ConvertPhpCode extends Command
                 $this->converter->setFilePath($filePath);
                 $fileContent = $this->converter->split($fileContent, $additionalFiles);
                 $convertedContent = $this->converter->convert($fileContent);
-                $outputFilePath = $this->converter->getFilePath() . self::CONVERTED_FILE_EXT;
-                file_put_contents($outputFilePath, $convertedContent);
+                if (!empty($additionalFiles)) var_dump($additionalFiles);exit;
+
+                if (self::CONVERT_AS_COPY) {
+                    $outputFilePath = $this->converter->getFilePath() . self::CONVERTED_FILE_EXT;
+                    file_put_contents($outputFilePath, $convertedContent);
+                } else {
+                    // Save original source code to .org copy of the PHP file
+                    $originalSource = file_get_contents($filePath);
+                    file_put_contents($this->converter->getFilePath() . '.orig', $originalSource);
+
+                    // Add converted source code to original PHP file
+                    file_put_contents($this->converter->getFilePath(), $convertedContent);
+                }
+
+                // HD: that code may create files which are not originally presented in the M1 source
                 foreach ($additionalFiles as $additionalFilePath) {
                     $fileContent = file_get_contents($additionalFilePath);
                     $convertedContent = $this->converter->setFilePath($additionalFilePath)->convert($fileContent);
