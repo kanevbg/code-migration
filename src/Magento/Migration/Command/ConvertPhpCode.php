@@ -121,6 +121,7 @@ class ConvertPhpCode extends Command
                 $this->converter->setFilePath($filePath);
                 $fileContent = $this->converter->split($fileContent, $additionalFiles);
                 $convertedContent = $this->converter->convert($fileContent);
+                if (!empty($additionalFiles)) var_dump($additionalFiles);exit;
 
                 if (self::CONVERT_AS_COPY) {
                     $outputFilePath = $this->converter->getFilePath() . self::CONVERTED_FILE_EXT;
