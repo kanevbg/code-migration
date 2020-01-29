@@ -123,7 +123,7 @@ class ActionHelper
         return dirname($this->abstractFileName) .
         DIRECTORY_SEPARATOR . ucfirst(preg_replace('/^.+_([a-zA-Z0-9]+)$/', '$1', $this->abstractNamespace)) .
         DIRECTORY_SEPARATOR . ($className == 'New' ? 'NewAction' :  $className) . ".php" .
-        (ConvertPhpCode::CONVERT_AS_COPY ? ConvertPhpCode::CONVERTED_FILE_EXT : '');
+        ConvertPhpCode::CONVERTED_FILE_EXT;
     }
 
     /**
